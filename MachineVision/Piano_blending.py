@@ -4,11 +4,16 @@ import matplotlib.pyplot as plt
 
 ''' A makes it more apparent d makes it less apparent '''
 piano_img = cv2.imread("Large_Piano.png", cv2.IMREAD_COLOR)
+dimensions = piano_img.shape
+height = piano_img.shape[0]
+width = piano_img.shape[1]
+channels = piano_img.shape[2]
+
 width = int(piano_img.shape[1] * 0.1)
 height = int(piano_img.shape[0] * 0.1)
 dim = (width, height)
 
-piano_img = cv2.resize(piano_img, (400,400), interpolation=cv2.INTER_AREA)
+piano_img = cv2.resize(piano_img, (width, height), interpolation=cv2.INTER_AREA)
 def showIm(image, name="img"):
     cv2.imshow(name, image)
 
@@ -21,17 +26,19 @@ def showIm(image, name="img"):
 # create an overlay image. You can use any image
 foreground = np.ones((100, 100, 3), dtype='uint8') * 255
 # Open the camera
-cap = cv2.VideoCapture(0)
+cap= cv2.VideoCapture(0)
 # Set initial value of weights
 alpha = 0.4
 while True:
     # read the background
     ret, background = cap.read()
+    frame_h, frame_w, frame_c = background.shape
+
     background = cv2.flip(background, 1)
     # Select the region in the background where we want to add the image and add the images using cv2.addWeighted()
-    added_image = cv2.addWeighted(background[0:350, 0:350, :], alpha, piano_img[0:350, 0:350, :], 1 - alpha, 0)
+    added_image = cv2.addWeighted(background[0:int(frame_h/2), 0:int(frame_w), :], alpha, piano_img[0:int(frame_h/2), 0:int(frame_w), :], 1 - alpha, 0)
     # Change the region with the result
-    background[0:350, 0:350] = added_image
+    background[0:int(frame_h/2), 0:int(frame_w)] = added_image
     # For displaying current value of alpha(weights)
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(background, 'alpha:{}'.format(alpha), (10, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
